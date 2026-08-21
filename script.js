@@ -1290,14 +1290,18 @@ function openProductModal(productId) {
   if (cashPrice) cashPrice.textContent = formatCurrency(product.otr_price);
 
   var dpSelect = document.getElementById("js-select-dp");
-  if (dpSelect && product.installments.length > 0) {
+  if (dpSelect) {
+    // Generate DP dari Rp 2.000.000 sampai Rp 15.000.000 dengan langkah Rp 500.000
     var dpHtml = "";
-    product.installments.forEach(function (inst, idx) {
-      dpHtml += '<option value="' + idx + '">' + formatCurrency(inst.dp) + '</option>';
-    });
+    var startDP = 2000000;
+    var maxDP = 15000000;
+    var stepDP = 500000;
+    for (var dp = startDP; dp <= maxDP; dp += stepDP) {
+      dpHtml += '<option value="' + dp + '">' + formatCurrency(dp) + '</option>';
+    }
     dpSelect.innerHTML = dpHtml;
     dpSelect.onchange = function () { renderTenor(product, parseInt(dpSelect.value)); };
-    renderTenor(product, 0);
+    renderTenor(product, startDP);
   }
 
   var toggleCash = document.getElementById("js-toggle-cash");
@@ -1399,22 +1403,54 @@ function selectSwatch(btn, name) {
 }
 
 // ============================================================
-// RENDER TENOR GRID
+// RENDER TENOR GRID (DINAMIS - INTERPOLASI)
 // ============================================================
-function renderTenor(product, dpIndex) {
-  var inst = product.installments[dpIndex];
-  if (!inst) return;
+function renderTenor(product, dpValue) {
+  var installments = product.installments;
+  if (!installments || installments.length === 0) return;
 
   var tenorGrid = document.getElementById("js-tenor-grid");
   var rateDisplay = document.getElementById("js-modal-installment-rate");
   var summaryDisplay = document.getElementById("js-modal-installment-summary");
-
   var tenors = [11, 17, 23, 29, 35];
+
+  // Interpolasi rates berdasarkan DP yang dipilih
+  function interpolateRates(selectedDP) {
+    var sorted = installments.slice().sort(function (a, b) { return a.dp - b.dp; });
+    // DP di bawah minimum -> pakai data terendah
+    if (selectedDP <= sorted[0].dp) return sorted[0].rates;
+    // DP di atas maksimum -> extrapolate dari dua data tertinggi
+    if (selectedDP >= sorted[sorted.length - 1].dp) {
+      var last = sorted[sorted.length - 1];
+      var secondLast = sorted[sorted.length - 2];
+      var result = {};
+      tenors.forEach(function (t) {
+        var slope = (last.rates[t] - secondLast.rates[t]) / (last.dp - secondLast.dp);
+        result[t] = Math.round(last.rates[t] + slope * (selectedDP - last.dp));
+      });
+      return result;
+    }
+    // Cari dua data yang mengapit selectedDP
+    for (var i = 0; i < sorted.length - 1; i++) {
+      if (selectedDP >= sorted[i].dp && selectedDP <= sorted[i + 1].dp) {
+        var result = {};
+        var ratio = (selectedDP - sorted[i].dp) / (sorted[i + 1].dp - sorted[i].dp);
+        tenors.forEach(function (t) {
+          result[t] = Math.round(sorted[i].rates[t] + ratio * (sorted[i + 1].rates[t] - sorted[i].rates[t]));
+        });
+        return result;
+      }
+    }
+    return sorted[0].rates;
+  }
+
+  var rates = interpolateRates(dpValue);
+
   if (tenorGrid) {
     var html = "";
     tenors.forEach(function (t, idx) {
-      var rate = inst.rates[t] || 0;
-      html += '<button class="tenor-btn' + (idx === tenors.length - 1 ? ' active' : '') + '" data-tenor="' + t + '" data-rate="' + rate + '" onclick="selectTenor(this, ' + inst.dp + ')">';
+      var rate = rates[t] || 0;
+      html += '<button class="tenor-btn' + (idx === tenors.length - 1 ? ' active' : '') + '" data-tenor="' + t + '" data-rate="' + rate + '" onclick="selectTenor(this, ' + dpValue + ')">';
       html += '  <div>' + t + 'x</div>';
       html += '  <div style="font-size:10px;font-weight:400;margin-top:2px;color:var(--text-muted);">' + formatCurrency(rate) + '</div>';
       html += '</button>';
@@ -1422,9 +1458,9 @@ function renderTenor(product, dpIndex) {
     tenorGrid.innerHTML = html;
 
     var lastTenor = tenors[tenors.length - 1];
-    var lastRate = inst.rates[lastTenor] || 0;
+    var lastRate = rates[lastTenor] || 0;
     if (rateDisplay) rateDisplay.textContent = formatCurrency(lastRate);
-    if (summaryDisplay) summaryDisplay.textContent = "Tenor " + lastTenor + " Bulan | Uang Muka " + formatCurrency(inst.dp);
+    if (summaryDisplay) summaryDisplay.textContent = "Tenor " + lastTenor + " Bulan | Uang Muka " + formatCurrency(dpValue);
   }
 }
 
