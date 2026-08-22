@@ -104,7 +104,7 @@ const PRODUCTS_DATA = [
     category: "Genio Series",
     otr_price: 21200000.0,
     images: [
-      "GENIO CBS - Vibrant Black.jpg"
+      "GENIO CBS - VIBRANT BLACK.jpg"
     ],
     installments: [
       { dp: 2200000, rates: { 11: 2260000, 17: 1601000, 23: 1280000, 29: 1102000, 35: 978000, 41: 895000, 47: 835000, 53: 791000, 59: 757000 } },
@@ -113,7 +113,7 @@ const PRODUCTS_DATA = [
       { dp: 4300000, rates: { 11: 2029000, 17: 1436000, 23: 1146000, 29: 988000, 35: 880000, 41: 806000, 47: 752000, 53: 711000, 59: 681000 } }
     ],
     variants: [
-      { name: "Vibrant Black", color: "#1f2937" }
+      { name: "VIBRANT BLACK", color: "#1f2937" }
     ]
   },
   {
@@ -123,9 +123,9 @@ const PRODUCTS_DATA = [
     category: "Genio Series",
     otr_price: 21625000.0,
     images: [
-      "GENIO CBS ISS - Fabulous Matte Black.jpg",
-      "GENIO CBS ISS - Fabulous Matte Brown.jpg",
-      "GENIO CBS ISS - Fabulous Matte Green.jpg"
+      "GENIO CBS ISS - FABULOUS MATTE BLACK.jpg",
+      "GENIO CBS ISS - FABULOUS MATTE BROWN.jpg",
+      "GENIO CBS ISS - FABULOUS MATTE GREEN.jpg"
     ],
     installments: [
       { dp: 2200000, rates: { 11: 2308000, 17: 1635000, 23: 1307000, 29: 1125000, 35: 998000, 41: 913000, 47: 852000, 53: 807000, 59: 772000 } },
@@ -134,9 +134,9 @@ const PRODUCTS_DATA = [
       { dp: 4400000, rates: { 11: 2066000, 17: 1461000, 23: 1165000, 29: 1006000, 35: 896000, 41: 820000, 47: 765000, 53: 724000, 59: 693000 } }
     ],
     variants: [
-      { name: "Fabulous Matte Black", color: "#1f2937" },
-      { name: "Fabulous Matte Brown", color: "#92400e" },
-      { name: "Fabulous Matte Green", color: "#166534" }
+      { name: "FABULOUS MATTE BLACK", color: "#1f2937" },
+      { name: "FABULOUS MATTE BROWN", color: "#92400e" },
+      { name: "FABULOUS MATTE GREEN", color: "#166534" }
     ]
   },
   {
